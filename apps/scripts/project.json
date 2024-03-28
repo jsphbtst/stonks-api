@@ -53,6 +53,23 @@
           "buildTarget": "scripts:build:production"
         }
       }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/scripts/**/*.ts"]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          {
+            "command": "./node_modules/.bin/tsc --noEmit -p apps/scripts/tsconfig.json"
+          }
+        ]
+      }
     }
   },
   "tags": []

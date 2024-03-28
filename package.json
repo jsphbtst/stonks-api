@@ -2,7 +2,10 @@
   "name": "@stocks-api/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "lint": "nx run-many --target=lint --all --parallel",
+    "typecheck": "nx run-many --target=typecheck --all --parallel"
+  },
   "private": true,
   "dependencies": {
     "axios": "^1.6.0",
