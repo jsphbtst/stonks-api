@@ -9,7 +9,7 @@ import (
 )
 
 func GetCompanyBySymbol(symbol string) (*types.Companies, error) {
-	stmt, err := db.Client.Prepare("SELECT symbol, name, about, sector, industry, mission, vision FROM Companies WHERE symbol = ?")
+	stmt, err := db.SqlClient.Prepare("SELECT symbol, name, about, sector, industry, mission, vision FROM Companies WHERE symbol = ?")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to prepare statement: %+v\n", err)
 		os.Exit(1)

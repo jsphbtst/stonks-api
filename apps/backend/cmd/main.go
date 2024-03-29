@@ -15,6 +15,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/jsphbtst/stonks-api/apps/backend/pkg/db"
 	"github.com/jsphbtst/stonks-api/apps/backend/pkg/middleware"
+	cache "github.com/jsphbtst/stonks-api/apps/backend/pkg/redis"
 	"github.com/jsphbtst/stonks-api/apps/backend/pkg/routes"
 	"github.com/jsphbtst/stonks-api/apps/backend/pkg/services"
 )
@@ -37,8 +38,16 @@ func main() {
 		log.Fatalf("Failed to connect to Turso: %+v\n", err)
 	}
 
-	services.Init(tursoDb)
 	log.Println("✅ Successfully connected to Turso")
+
+	redisUri := os.Getenv("REDIS_URI")
+	redisClient, err := cache.Init(redisUri)
+	if err != nil {
+		log.Fatalf("Failed to connect to Redis: %+v\n", err)
+	}
+	log.Println("✅ Successfully connected to Redis")
+
+	services.Init(tursoDb, redisClient)
 
 	router := chi.NewRouter()
 	router.Use(middleware.JsonContentTypeHeader)
