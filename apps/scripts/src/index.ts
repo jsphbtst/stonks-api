@@ -42,6 +42,18 @@ async function main() {
     console.log(`[${idx}]: Processing ${symbol}...`)
 
     try {
+      const response = await client.execute({
+        sql: 'SELECT * FROM Companies where symbol = ?',
+        args: [symbol]
+      })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const responseJson = response.toJSON() as { rows: any[] }
+      const isInDb = responseJson?.rows?.length > 0
+      if (isInDb) {
+        console.log(`${symbol} is already in Turso. Skipping...`)
+        continue
+      }
+
       const company = await getCompanyInformation(symbol)
 
       const [address, postalAddress] = await Promise.all([
