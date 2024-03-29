@@ -40,14 +40,16 @@ func main() {
 
 	log.Println("✅ Successfully connected to Turso")
 
+	ctx := context.Background()
+
 	redisUri := os.Getenv("REDIS_URI")
-	redisClient, err := cache.Init(redisUri)
+	redisClient, err := cache.Init(redisUri, ctx)
 	if err != nil {
 		log.Fatalf("Failed to connect to Redis: %+v\n", err)
 	}
 	log.Println("✅ Successfully connected to Redis")
 
-	services.Init(tursoDb, redisClient)
+	services.Init(tursoDb, redisClient, ctx)
 
 	router := chi.NewRouter()
 	router.Use(middleware.JsonContentTypeHeader)

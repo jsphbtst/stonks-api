@@ -13,7 +13,7 @@ type Cache struct {
 
 var cache = &Cache{}
 
-func Init(uri string) (*redis.Client, error) {
+func Init(uri string, ctx context.Context) (*redis.Client, error) {
 	opt, err := redis.ParseURL(uri)
 	if err != nil {
 		return nil, err
@@ -21,8 +21,6 @@ func Init(uri string) (*redis.Client, error) {
 
 	client := redis.NewClient(opt)
 	cache.Client = client
-
-	ctx := context.Background()
 	cache.Ctx = ctx
 
 	return client, nil
