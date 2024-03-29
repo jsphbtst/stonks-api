@@ -13,8 +13,10 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	"github.com/jsphbtst/stonks-api/apps/backend/pkg/db"
 	"github.com/jsphbtst/stonks-api/apps/backend/pkg/middleware"
 	"github.com/jsphbtst/stonks-api/apps/backend/pkg/routes"
+	"github.com/jsphbtst/stonks-api/apps/backend/pkg/services"
 )
 
 const PORT int = 3000
@@ -27,13 +29,28 @@ func main() {
 		log.Printf("Error loading .env file %+v\n", err)
 	}
 
+	database := os.Getenv("TURSO_URL")
+	tursoToken := os.Getenv("TURSO_AUTH_TOKEN")
+	uri := fmt.Sprintf("%s?authToken=%s", database, tursoToken)
+	tursoDb, err := db.Init(uri)
+	if err != nil {
+		log.Fatalf("Failed to connect to Turso: %+v\n", err)
+	}
+
+	services.Init(tursoDb)
+	log.Println("✅ Successfully connected to Turso")
+
 	router := chi.NewRouter()
 	router.Use(middleware.JsonContentTypeHeader)
 	router.Use(middleware.RouteRuntimeLogger)
 
 	router.Get("/", routes.Root)
 
-	log.Printf("Starting server in port %d\n", PORT)
+	router.Route("/api/v1", func(r chi.Router) {
+		r.Get("/companies/{symbol}", routes.GetCompanyById)
+	})
+
+	log.Printf("✅ Starting server in port %d\n", PORT)
 	addr := fmt.Sprintf(":%d", PORT)
 	server := &http.Server{Addr: addr, Handler: router}
 
