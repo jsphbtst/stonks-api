@@ -29,7 +29,7 @@ func GetCompanyById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != redis.Nil {
-		log.Printf("Found %s in cache.\n", symbol)
+		log.Printf("Found Stonks %s in cache.\n", symbol)
 		w.Write([]byte(val))
 		return
 	}
@@ -79,6 +79,20 @@ func GetCompanyBySearchQuery(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	ctx := r.Context()
+	val, err := db.RedisClient.Get(ctx, searchQuery).Result()
+	if err != nil && err != redis.Nil {
+		payload := fmt.Sprintf("{\"message\": \"%s\"}", err.Error())
+		w.Write([]byte(payload))
+		return
+	}
+
+	if err != redis.Nil {
+		log.Printf("Found Search Query `%s` in cache.\n", searchQuery)
+		w.Write([]byte(val))
+		return
+	}
+
 	results, err := db.AlgoliaIndex.Search(searchQuery)
 	if err != nil {
 		payload := fmt.Sprintf("{\"message\": \"%s\"}", err.Error())
@@ -96,6 +110,19 @@ func GetCompanyBySearchQuery(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(payload))
 		return
 	}
+
+	go func() {
+		cacheCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		err = db.RedisClient.Set(cacheCtx, searchQuery, jsonData, 120*time.Second).Err()
+		if err != nil {
+			log.Println("Failed to Redis SetEX: ", err)
+			return
+		}
+
+		log.Printf("Concurrently set `%s` to Redis cache\n", searchQuery)
+	}()
 
 	w.Write(jsonData)
 }
