@@ -70,3 +70,32 @@ func GetCompanyById(w http.ResponseWriter, r *http.Request) {
 
 	w.Write(jsonData)
 }
+
+func GetCompanyBySearchQuery(w http.ResponseWriter, r *http.Request) {
+	searchQuery := r.URL.Query().Get("query")
+	if len(searchQuery) < 1 {
+		payload := fmt.Sprintf("{\"message\": \"%s\"}", "Search query required")
+		w.Write([]byte(payload))
+		return
+	}
+
+	results, err := db.AlgoliaIndex.Search(searchQuery)
+	if err != nil {
+		payload := fmt.Sprintf("{\"message\": \"%s\"}", err.Error())
+		w.Write([]byte(payload))
+		return
+	}
+
+	var records []types.Companies
+	results.UnmarshalHits(&records)
+
+	payload := map[string][]types.Companies{"data": records}
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		payload := fmt.Sprintf("{\"message\": \"%s\"}", err.Error())
+		w.Write([]byte(payload))
+		return
+	}
+
+	w.Write(jsonData)
+}

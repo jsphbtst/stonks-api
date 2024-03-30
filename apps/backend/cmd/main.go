@@ -13,6 +13,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	"github.com/jsphbtst/stonks-api/apps/backend/pkg/algoliasearch"
 	"github.com/jsphbtst/stonks-api/apps/backend/pkg/db"
 	"github.com/jsphbtst/stonks-api/apps/backend/pkg/middleware"
 	cache "github.com/jsphbtst/stonks-api/apps/backend/pkg/redis"
@@ -47,8 +48,14 @@ func main() {
 	}
 	log.Println("✅ Successfully connected to Redis")
 
-	services.Init(tursoDb, redisClient)
-	routes.Init(tursoDb, redisClient)
+	algoliaAppId := os.Getenv("ALGOLIA_APP_ID")
+	algoliaApiKey := os.Getenv("ALGOLIA_API_KEY")
+	algoliaIndexName := os.Getenv("ALGOLIA_INDEX_NAME")
+	algoliaClient, algoliaIndex := algoliasearch.Init(algoliaAppId, algoliaApiKey, algoliaIndexName)
+	log.Println("✅ Successfully connected to Algolia")
+
+	services.Init(tursoDb, redisClient, algoliaClient, algoliaIndex)
+	routes.Init(tursoDb, redisClient, algoliaClient, algoliaIndex)
 
 	router := chi.NewRouter()
 	router.Use(middleware.JsonContentTypeHeader)
@@ -57,6 +64,7 @@ func main() {
 	router.Get("/", routes.Root)
 
 	router.Route("/api/v1", func(r chi.Router) {
+		r.Get("/companies/search", routes.GetCompanyBySearchQuery)
 		r.Get("/companies/{symbol}", routes.GetCompanyById)
 	})
 
