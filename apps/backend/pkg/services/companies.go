@@ -1,7 +1,6 @@
 package services
 
 import (
-	"database/sql"
 	"fmt"
 	"os"
 
@@ -26,10 +25,8 @@ func GetCompanyBySymbol(symbol string) (*types.Companies, error) {
 		&company.Vision,
 	)
 
+	// can be sql.ErrNoRows
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return nil, sql.ErrNoRows
-		}
 		return nil, err
 	}
 

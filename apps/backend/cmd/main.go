@@ -40,10 +40,8 @@ func main() {
 
 	log.Println("✅ Successfully connected to Turso")
 
-	ctx := context.Background()
-
 	redisUri := os.Getenv("REDIS_URI")
-	redisClient, err := cache.Init(redisUri, ctx)
+	redisClient, err := cache.Init(redisUri)
 	if err != nil {
 		log.Fatalf("Failed to connect to Redis: %+v\n", err)
 	}

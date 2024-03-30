@@ -29,23 +29,8 @@ func GetCompanyById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != redis.Nil {
-		var company types.Companies
-		if err := json.Unmarshal([]byte(val), &company); err != nil {
-			payload := fmt.Sprintf("{\"message\": \"%s\"}", err.Error())
-			w.Write([]byte(payload))
-			return
-		}
-
 		log.Printf("Found %s in cache.\n", symbol)
-		payload := map[string]types.Companies{"data": company}
-		jsonData, err := json.Marshal(payload)
-		if err != nil {
-			payload := fmt.Sprintf("{\"message\": \"%s\"}", err.Error())
-			w.Write([]byte(payload))
-			return
-		}
-
-		w.Write(jsonData)
+		w.Write([]byte(val))
 		return
 	}
 
@@ -62,25 +47,6 @@ func GetCompanyById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go func() {
-		cacheCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-
-		data, err := json.Marshal(company)
-		if err != nil {
-			log.Println("Failed to marshall company data: ", err)
-			return
-		}
-
-		err = db.RedisClient.Set(cacheCtx, symbol, data, 120*time.Second).Err()
-		if err != nil {
-			log.Println("Failed to Redis SetEX: ", err)
-			return
-		}
-
-		log.Printf("Concurrently set %s to Redis cache\n", symbol)
-	}()
-
 	payload := map[string]*types.Companies{"data": company}
 	jsonData, err := json.Marshal(payload)
 	if err != nil {
@@ -88,6 +54,19 @@ func GetCompanyById(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(payload))
 		return
 	}
+
+	go func() {
+		cacheCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		err = db.RedisClient.Set(cacheCtx, symbol, jsonData, 120*time.Second).Err()
+		if err != nil {
+			log.Println("Failed to Redis SetEX: ", err)
+			return
+		}
+
+		log.Printf("Concurrently set %s to Redis cache\n", symbol)
+	}()
 
 	w.Write(jsonData)
 }
