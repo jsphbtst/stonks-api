@@ -49,7 +49,8 @@ func main() {
 	}
 	log.Println("✅ Successfully connected to Redis")
 
-	services.Init(tursoDb, redisClient, ctx)
+	services.Init(tursoDb, redisClient)
+	routes.Init(tursoDb, redisClient)
 
 	router := chi.NewRouter()
 	router.Use(middleware.JsonContentTypeHeader)
