@@ -10,6 +10,9 @@
     "migrate:opensearch": {
       "command": "bun apps/scripts/src/migrate-opensearch.ts"
     },
+    "migrate:algolia": {
+      "command": "bun apps/scripts/src/migrate-algolia.ts"
+    },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
