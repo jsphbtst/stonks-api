@@ -4,55 +4,11 @@
   "sourceRoot": "apps/scripts/src",
   "projectType": "application",
   "targets": {
-    "execute": {
-      "command": "bun apps/scripts/src/index.ts"
+    "migrate:turso": {
+      "command": "bun apps/scripts/src/migrate-turso.ts"
     },
-    "build": {
-      "executor": "@nx/esbuild:esbuild",
-      "outputs": ["{options.outputPath}"],
-      "defaultConfiguration": "production",
-      "options": {
-        "platform": "node",
-        "outputPath": "dist/apps/scripts",
-        "format": ["cjs"],
-        "bundle": false,
-        "main": "apps/scripts/src/index.ts",
-        "tsConfig": "apps/scripts/tsconfig.app.json",
-        "assets": ["apps/scripts/src/assets"],
-        "generatePackageJson": true,
-        "esbuildOptions": {
-          "sourcemap": true,
-          "outExtension": {
-            ".js": ".js"
-          }
-        }
-      },
-      "configurations": {
-        "development": {},
-        "production": {
-          "esbuildOptions": {
-            "sourcemap": false,
-            "outExtension": {
-              ".js": ".js"
-            }
-          }
-        }
-      }
-    },
-    "serve": {
-      "executor": "@nx/js:node",
-      "defaultConfiguration": "development",
-      "options": {
-        "buildTarget": "scripts:build"
-      },
-      "configurations": {
-        "development": {
-          "buildTarget": "scripts:build:development"
-        },
-        "production": {
-          "buildTarget": "scripts:build:production"
-        }
-      }
+    "migrate:opensearch": {
+      "command": "bun apps/scripts/src/migrate-opensearch.ts"
     },
     "lint": {
       "executor": "@nx/linter:eslint",
