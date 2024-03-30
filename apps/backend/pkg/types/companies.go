@@ -8,4 +8,6 @@ type Companies struct {
 	Industry string `json:"industry"`
 	Mission  string `json:"mission"`
 	Vision   string `json:"vision"`
+	Phone    string `json:"phone"`
+	Website  string `json:"website"`
 }
