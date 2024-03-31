@@ -22,6 +22,7 @@ import (
 )
 
 const PORT int = 3000
+const RATE_LIMIT int = 12
 
 func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
@@ -60,6 +61,7 @@ func main() {
 	router := chi.NewRouter()
 	router.Use(middleware.JsonContentTypeHeader)
 	router.Use(middleware.RouteRuntimeLogger)
+	router.Use(middleware.RateLimitMiddleware(redisClient, RATE_LIMIT))
 
 	router.Get("/", routes.Root)
 
