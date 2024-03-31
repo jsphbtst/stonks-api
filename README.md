@@ -20,5 +20,5 @@ Lastly, I also implemented a custom rate limiter middleware that makes use of Re
 
 ## Future Plans
 
-[] Implement a custom RAG solution for my search (hosted in `GET /api/v2/search?query=`)
-[] Build out the frontend to quickly demo blazingly fast search
+- [ ] Implement a custom RAG solution for my search (hosted in `GET /api/v2/search?query=`)
+- [ ] Build out the frontend to quickly demo blazingly fast search
