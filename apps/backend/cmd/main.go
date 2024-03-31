@@ -58,14 +58,14 @@ func main() {
 	services.Init(tursoDb, redisClient, algoliaClient, algoliaIndex)
 	routes.Init(tursoDb, redisClient, algoliaClient, algoliaIndex)
 
-	env := os.Getenv("ENV")
-	isDevelopment := env == "dev" || env == "development"
+	rateLimitFlag := os.Getenv("IS_RATE_LIMIT_ON")
+	isRateLimitOn := rateLimitFlag == "true"
 
 	router := chi.NewRouter()
 	router.Use(middleware.JsonContentTypeHeader)
 	router.Use(middleware.RouteRuntimeLogger)
 
-	if !isDevelopment {
+	if isRateLimitOn {
 		router.Use(middleware.RateLimitMiddleware(redisClient, RATE_LIMIT))
 	}
 
