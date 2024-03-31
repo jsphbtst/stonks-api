@@ -4,7 +4,8 @@
   "license": "MIT",
   "scripts": {
     "lint": "nx run-many --target=lint --all --parallel",
-    "typecheck": "nx run-many --target=typecheck --all --parallel"
+    "typecheck": "nx run-many --target=typecheck --all --parallel",
+    "ci:check": "npm run lint && npm run typecheck"
   },
   "private": true,
   "dependencies": {
