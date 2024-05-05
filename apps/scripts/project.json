@@ -13,6 +13,9 @@
     "migrate:algolia": {
       "command": "bun apps/scripts/src/migrate-algolia.ts"
     },
+    "migrate:openai-embeddings": {
+      "command": "bun apps/scripts/src/migrate-openai-embeddings.ts"
+    },
     "lint": {
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
